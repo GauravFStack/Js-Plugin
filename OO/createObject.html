@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>创建对象</title>
+</head>
+<body>
+	
+<script>
+//创建对象
+
+
+//【工厂模式】
+// function Person(name, age) {
+// 	var o = new Object();
+// 	o.name = name;
+// 	o.age = age;
+// 	o.sayName = function() {
+// 		console.log(this.name);
+// 	};
+// 	return o;
+// }
+
+// var person1 = Person('Nicholas', 29),
+// 	person2 = Person('Greg', 27);
+
+//工厂模式问题
+//工厂模式虽然解决了创建多个相似对象的问题，但却没解决对象识别的问题
+
+//【工厂模式】
+
+
+
+//【构造函数模式】
+// function Person(name, age) {
+// 	this.name = name;
+// 	this.age = age;
+// 	this.sayName = function() {
+// 		console.log(this.name);
+// 	};
+// }
+
+// var person1 = new Person('Nicholas', 29),
+// 	person2 = new Person('Greg', 27);
+
+// console.log(person1.constructor === Person); //true
+// console.log(person1 instanceof Object); //true
+// console.log(person1 instanceof Person); //true
+
+//构造函数模式问题
+//对象的 constructor 属性最初是用来标识对象类型的。检测对象类型，还是 instanceof 更可靠。
+//创建的对象既是 Object 的实例，也是 Person 的实例。
+//创建自定义的构造函数意味着将来可以将它的实例标识为一种特定的类型；而这正是构造函数模式胜过工厂模式的地方。
+
+//最大问题在于每个方法都会在实例上重新创建一遍
+
+//【构造函数模式】
+
+
+
+//【原型模式】
+// function Person() {}
+// Person.prototype.name = 'Nicholas';
+// // Person.prototype.age = 29;
+// // Person.prototype.sayName = function() {
+// // 	console.log(this.name);
+// // };
+
+// var person1 = new Person();
+// person1.gender = 'male';
+// person1.age = 29;
+// console.log(Object.keys(person1));
+// console.log(Object.getOwnPropertyNames(Person.prototype));
+// for (var o in person1) {
+// 	console.log(o);
+// }
+
+String.prototype.reverseString = function() {
+	return this.split('').reverse().join('');
+};
+console.log('Hello World!'.reverseString());
+
+// person1.sayName();
+// console.log(Person.prototype.constructor === Person);
+// console.log(person1.__proto__ == Person.prototype); //true
+// console.log(Person.prototype.isPrototypeOf(person1)); //true
+// console.log(Object.getPrototypeOf(person1) === Person.prototype); //ES5方法 true
+// console.log(Object.getPrototypeOf(person1));
+
+//原型模式问题
+//1. 每个实例共享属性和方法，若一个实例更改引用类型属性，所有实例该属性均会被改变。
+//2. 不能传参
+//指针[[Prototype]]存在于实例与构造函数的原型对象之间，在 Firefox、Safari 和 Chrome 在可以通过 __proto__ 访问。
+
+// console.log(person1.hasOwnProperty('name'));
+
+//hasOwnProperty 可以检测属性是存在于实例上还是从原型继承来的
+
+// console.log(Object.keys(Person.prototype));
+// person1.name = 'Greg';
+// console.log(Object.keys(person1));
+
+//使用ES5的 Object.keys 方法也可以返回所有可枚举的属性。
+
+// console.log(Object.getOwnPropertyNames(Person.prototype));
+
+// getOwnPropertyNames 方法会返回所以属性，包括不可枚举的。上面两个方法都可以用来替代 for in循环。
+
+// function Person() {}
+
+// Person.prototype = {
+// 	constructor: Person,
+// 	name: 'Nicholas',
+// 	age: 29,
+// 	sayName: function() {
+// 		console.log(this.name);
+// 	}
+// };
+
+//可以通过对象字面量的方式书写原型对象，不过由于对原型的重写会丢掉 constructor 属性，可以手动指定。
+//不过这样会导致 constructor 属性的 [[Enumerable]] 为true，可以通过ES5的 defineProperty 方法解决。
+
+// function Person() {}
+
+// Person.prototype = {
+// 	name: 'Nicholas',
+// 	age: 29,
+// 	sayName: function() {
+// 		console.log(this.name);
+// 	}
+// };
+
+// Object.defineProperty(Person.prototype, 'constructor', {
+// 	enumerable: false,
+// 	value: Person
+// });
+
+// console.log(Object.keys(Person.prototype));
+// console.log(Object.getOwnPropertyNames(Person.prototype));
+
+//【原型模式】
+
+
+
+//【组合模式】
+// function Person(name, age) {
+// 	this.name = name;
+// 	this.age = age;
+// 	this.friends = ['Shelby', 'Court'];
+// }
+
+// Person.prototype = {
+// 	constructor: Person,
+// 	sayName: function() {
+// 		console.log(this.name);
+// 	}
+// };
+
+// var person1 = new Person('Nicholas', 29),
+// 	person2 = new Person('Greg', 27);
+
+// person1.friends.push('Van');
+// console.log(person1.friends);
+// console.log(person2.friends);
+// console.log(person1.friends === person2.friends); //false
+// console.log(person1.sayName === person2.sayName); //true
+
+//这种构造函数和原型混合的模式，是目前使用最广、认同度最高的一种创建自定义类型的方法。
+//【组合模式】
+
+
+
+//【动态原型模式】
+// function Person(name, age) {
+// 	this.name = name;
+// 	this.age = age;
+
+// 	if (typeof this.sayName == 'function') return;
+// 		// console.log('create');
+// 	Person.prototype.sayName = function() {
+// 		console.log(this.name);
+// 	};
+
+// 	Person.prototype.sayAge = function() {
+// 		console.log(this.age);
+// 	};
+// }
+
+// var person1 = new Person('xyx', 123),
+// 	person2 = new Person('yyy', 456);
+
+// console.log(person1);
+// console.log(person2);
+
+// person1.sayName();
+// person2.sayAge();
+
+//动态原型模式问题
+//动态原型模式实际是是对组合模式进行了一次包装，将对原型对象的初始化操作放入构造函数内部了。
+//对原型方法存在的验证可以避免对原型对象多次初始化。
+//【动态原型模式】
+
+
+
+//【寄生构造函数模式】
+// function Person(name, age) {
+// 	var o = new Object();
+// 	o.name = name;
+// 	o.age = age;
+// 	o.sayName = function() {
+// 		console.log(this.name);
+// 	};
+// 	return o;
+// }
+
+// var person1 = new Person('Nicholas', 29),
+// 	person2 = Person('xxx', 27);
+// console.log(person1);
+// console.log(person2);
+
+//例：
+// function SpecialArray() {
+// 	var values = new Array();
+
+// 	values.push.apply(values, arguments);
+
+// 	values.toPipedString = function() {
+// 		return this.join('|');
+// 	};
+
+// 	return values;
+// }
+
+// var colors = new SpecialArray('red', 'blue', 'green');
+// console.log(colors.toPipedString());
+
+//寄生构造函数问题
+//寄生构造函数与工厂模式基本一致，唯一的区别的就是在调用时使用了 new 操作符。
+//与工厂模式一样，通过该模式生成的对象实例与构造函数之间并无关联，无法用 instanceof 来判断。
+//不推荐使用
+
+//【寄生构造函数模式】
+
+
+
+//【稳妥构造函数模式】
+// function Person(name, age) {
+// 	var o = new Object();
+
+// 	//可以定义些私有变量
+
+// 	o.sayName = function() {
+// 		console.log(name);
+// 	};
+
+// 	return o;
+// }
+
+// var friend = Person('Nicholas', 29);
+// friend.sayName();
+
+//稳妥构造函数问题
+//稳妥对象是指没有公共属性，而且其方法也不引用 this 的对象。
+//最适合用于禁止使用 this 和 new 的场景，以及防止外部改动。
+//与工厂模式不同的是，我们并没有将 name 和 age 这些属性挂载到对象上，只能通过 sayName 方法进行访问。
+//安全性
+
+//【稳妥构造函数模式】
+
+</script>
+</body>
+</html>
